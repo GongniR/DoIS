@@ -41,6 +41,11 @@ class Graph:
                     edges.append((i, j))
         return edges
 
+    def set_adjacency_table(self, adjacency_table):
+        self.adjacency_table = adjacency_table
+        self.nodes = [i for i in range(len(adjacency_table))]
+        self.edges = self.__get_edges(adjacency_table)
+
     def draw_graph(self):
         graph = self.adjacency_table
         nodes = self.nodes
@@ -66,7 +71,3 @@ class Graph:
         plt.tight_layout()
         plt.axis("off")
         plt.show()
-g = Graph(6)
-print(g.adjacency_table)
-print(g.edges)
-g.draw_graph()
