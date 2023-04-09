@@ -2,6 +2,7 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 import networkx as nx
+import os
 
 
 class Graph:
@@ -46,7 +47,11 @@ class Graph:
         self.nodes = [i for i in range(len(adjacency_table))]
         self.edges = self.__get_edges(adjacency_table)
 
-    def draw_graph(self):
+    def generate_new_graph(self, count_point):
+        adjacency_table = self.__get_random_adjacency_table(count_point)
+        self.set_adjacency_table(adjacency_table)
+
+    def draw_graph(self, show=True):
         graph = self.adjacency_table
         nodes = self.nodes
         edges = self.edges
@@ -70,4 +75,15 @@ class Graph:
         # рисуем граф и отображаем его
         plt.tight_layout()
         plt.axis("off")
-        plt.show()
+        if show:
+            plt.show()
+            plt.close()
+        else:
+            try:
+                os.remove('LW_1/plot/network.jpg')
+            except:
+                pass
+            path = 'E:\\GitHub\\DoIS\\LW_1\\plot\\network.jpg'
+            plt.savefig(path)
+            plt.close()
+            return path

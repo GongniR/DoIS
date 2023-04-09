@@ -1,5 +1,4 @@
 import numpy as np
-
 import random
 import matplotlib.pyplot as plt
 
@@ -38,6 +37,14 @@ class FitnessMin:
     def __init__(self):
         self.values = [0]
 
+class GA:
+    def __init__(self, adjacency_table, start_point, finish_point):
+        self.adjacency_table = adjacency_table
+        self.start_point = start_point
+        self.finish_point = finish_point
+        self.len_graph = len(adjacency_table)
+        self.len_chrom = self.len_graph * len(adjacency_table[0])
+
 
 def graph_fitness(individual):
     _sum = 0
@@ -48,7 +55,6 @@ def graph_fitness(individual):
             _sum += Graph[st][j]
             st = j
     return _sum,
-
 
 def individual_create():
     """Генерация индивидуума"""
