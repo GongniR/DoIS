@@ -20,7 +20,7 @@ class Ui(QtWidgets.QMainWindow):
         self.gen_alg = 0
         # Кнопки
         # pushButton
-
+        self.path_short = False
         # граф
         self.Count_points_spinBox.valueChanged.connect(self.change_count_point)
         self.Generate_graph_pushButton.clicked.connect(self.generate_graph)
@@ -40,8 +40,8 @@ class Ui(QtWidgets.QMainWindow):
         size_population = self.Size_population_spinBox.value()
         count_generation = self.Count_General_spinBox.value()
         mutation = self.Mutantion_doubleSpinBox.value() / 100
-        start_point = self.Start_point_spinBox.value()
-        finish_point = self.Finish_points_spinBox.value()
+        start_point = self.Start_point_spinBox.value()-1
+        finish_point = self.Finish_points_spinBox.value()-1
 
         self.gen_alg = ga.GA(adjacency_table=self.graph.adjacency_table,
                              start_point=start_point,
@@ -55,7 +55,8 @@ class Ui(QtWidgets.QMainWindow):
     def get_table_population(self):
         self.Adjacency_TabletableWidget.setRowCount(len(self.gen_alg.population))
         self.Adjacency_TabletableWidget.setColumnCount(len(self.gen_alg.population[0]))
-        self.Adjacency_TabletableWidget.setHorizontalHeaderLabels([str(i + 1) for i in range(len(self.gen_alg.population[0]))])
+        self.Adjacency_TabletableWidget.setHorizontalHeaderLabels(
+            [str(i + 1) for i in range(len(self.gen_alg.population[0]))])
 
         for row in range(len(self.gen_alg.population)):
             for column in range(len(self.gen_alg.population[0])):
@@ -67,7 +68,8 @@ class Ui(QtWidgets.QMainWindow):
     def get_table_generation(self):
         self.Adjacency_TabletableWidget.setRowCount(len(self.gen_alg.list_population[0]))
         self.Adjacency_TabletableWidget.setColumnCount(len(self.gen_alg.list_population))
-        self.Adjacency_TabletableWidget.setHorizontalHeaderLabels([str(f'Поколение {i}') for i in range(len(self.gen_alg.list_population))])
+        self.Adjacency_TabletableWidget.setHorizontalHeaderLabels(
+            [str(f'Поколение {i}') for i in range(len(self.gen_alg.list_population))])
 
         for row in range(len(self.gen_alg.list_population[0])):
             for column in range(len(self.gen_alg.list_population)):
@@ -75,12 +77,13 @@ class Ui(QtWidgets.QMainWindow):
                 item.setTextAlignment(Qt.AlignHCenter)
 
                 self.Adjacency_TabletableWidget.setItem(row, column, item)
+
     def Train_GA(self):
         self.gen_alg.TrainGA()
         self.Statistics_view_radioButton.setChecked(True)
         self.show_statistics()
         self.show_generation_info()
-
+        self.draw_shortest_path()
     def change_count_point(self):
         """Максимальное значение spinbox"""
         max_value = self.Count_points_spinBox.value()
@@ -129,8 +132,17 @@ class Ui(QtWidgets.QMainWindow):
             self.Image_label.clear()
             return
 
-        path_net = self.graph.draw_graph(show=False)
+        path_net = self.graph.draw_graph(show=False, path_short=self.path_short)
         self.view_image(path_net)
+
+    def draw_shortest_path(self):
+        path = self.gen_alg.get_shortest_path()
+        start_point = self.Start_point_spinBox.value()-1
+        finish_point = self.Finish_points_spinBox.value()-1
+        self.graph.set_shortest_path(new_path=path,
+                                     start_point=start_point,
+                                     finish_point=finish_point)
+        self.path_short = True
 
     def show_statistics(self):
         if self.Statistics_view_radioButton.isChecked() is False:
@@ -160,9 +172,6 @@ class Ui(QtWidgets.QMainWindow):
 
 
 if __name__ == '__main__':
-    result = subprocess.run(["python", "-c", "print(subprocess)"], capture_output=True, text=True)
-    print('output: ', result.stdout)
-    print('error: ', result.stderr)
     app = QtWidgets.QApplication(sys.argv)
     window = Ui()
     window.show()

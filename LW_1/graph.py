@@ -6,13 +6,13 @@ import os
 
 
 class Graph:
-    def __init__(self, count_point, start_point=-1, finish_point=-1, shortest_path=[0]):
+    def __init__(self, count_point, start_point=-1, finish_point=-1):
         self.adjacency_table = self.__get_random_adjacency_table(count_point)
         self.nodes = [i for i in range(len(self.adjacency_table))]
         self.edges = self.__get_edges(self.adjacency_table)
         self.start_point = start_point
         self.finish_point = finish_point
-        self.shortest_path = shortest_path
+        self.shortest_path = [0]
 
     @staticmethod
     def __get_random_adjacency_table(count_point: int) -> list[list]:
@@ -51,7 +51,22 @@ class Graph:
         adjacency_table = self.__get_random_adjacency_table(count_point)
         self.set_adjacency_table(adjacency_table)
 
-    def draw_graph(self, show=True):
+    def set_shortest_path(self, new_path, start_point, finish_point):
+        self.start_point = start_point
+        self.finish_point = finish_point
+        self.shortest_path = new_path
+
+    def __get_shortest_path_edges(self):
+        index = self.shortest_path.index(self.finish_point)
+        if index == 0:
+            path = [self.start_point] + [self.shortest_path[index]]
+        else:
+            path = [self.start_point] + self.shortest_path[:index]
+
+        edges = [(path[i], path[i + 1]) for i in range(len(path) - 1)]
+        return edges
+
+    def draw_graph(self, show=True, path_short=False):
         graph = self.adjacency_table
         nodes = self.nodes
         edges = self.edges
@@ -69,7 +84,19 @@ class Graph:
             alpha=0.5,
             edge_color="tab:red",
         )
-        labels = {i: str(i) for i in range(len(nodes))}
+        path = 'E:\\GitHub\\DoIS\\LW_1\\plot\\network.jpg'
+        if path_short:
+            path_edges = self.__get_shortest_path_edges()
+            nx.draw_networkx_edges(
+                G,
+                pos,
+                edgelist=path_edges,
+                width=8,
+                alpha=1,
+                edge_color="tab:green",
+            )
+            path = 'E:\\GitHub\\DoIS\\LW_1\\plot\\network_path.jpg'
+        labels = {i: str(i+1) for i in range(len(nodes))}
         nx.draw_networkx_labels(G, pos, labels, font_size=15, font_color="whitesmoke")
 
         # рисуем граф и отображаем его
@@ -80,10 +107,10 @@ class Graph:
             plt.close()
         else:
             try:
-                os.remove('LW_1/plot/network.jpg')
+                os.remove(path)
             except:
                 pass
-            path = 'E:\\GitHub\\DoIS\\LW_1\\plot\\network.jpg'
+
             plt.savefig(path)
             plt.close()
             return path

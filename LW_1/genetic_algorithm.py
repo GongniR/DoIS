@@ -40,7 +40,7 @@ class GA:
 
         self.minFitnessValues = []
         self.meanFitnessValues = []
-
+        self.best_ind = []
         self.population = []
         self.generationCounter = 0
         self.list_population = []
@@ -139,16 +139,27 @@ class GA:
 
         return path
 
+
     def TrainGA(self):
         generationCounter = self.generationCounter
+        print(f'---------------< {generationCounter} >--------------')
         population = self.population
+        print(f'---------------< Начальная популяция >--------------')
+        print(population)
         fitnessValues = list(map(self.graph_fitness, population))
         while generationCounter < self.max_generation:
             self.list_population.append(population)
             generationCounter += 1
+            print(f'---------------< {generationCounter} >--------------')
+
             offspring = self.selTournament(population, len(population))
+
+            print(f'---------------< Популяция после селекции >--------------')
+            print(offspring)
+
             offspring = list(map(self.__clone, offspring))
             new_offspring = []
+
             for child1, child2 in zip(offspring[::2], offspring[1::2]):
                 if random.random() < self.crossover:
                     child1, child2 = self.cxOrdered(child1, child2)
@@ -156,9 +167,15 @@ class GA:
                 new_offspring.append(Individual(child2))
             offspring = new_offspring.copy()
 
+            print(f'---------------< Популяция после скрещивания >--------------')
+            print(offspring)
+
             for mutant in offspring:
                 if random.random() < self.mutation:
                     self.mutantShuffle(mutant, indpb=1. / self.len_chrom / 36)
+
+            print(f'---------------< Популяция после мутации >--------------')
+            print(offspring)
 
             freshFitnessValues = list(map(self.graph_fitness, offspring))
             for individual, fitnessValue in zip(offspring, freshFitnessValues):
@@ -172,5 +189,9 @@ class GA:
             self.meanFitnessValues.append(meanFitness)
 
             best_index = fitnessValues.index(min(fitnessValues))
-            state = f"Поколение {generationCounter}: Макс приспособ = {minFitness}, Средняя приспособ= {meanFitness} \n Лучший индивидуум = {population[best_index]}"
+            self.best_ind = population[best_index]
+
+            state = f"Поколение {generationCounter}: Макс приспособ = {minFitness}, Средняя приспособ= {meanFitness} \n Лучший индивидуум = {self.best_ind}"
             self.statistics_generation.append(state)
+    def get_shortest_path(self):
+        return self.best_ind[self.finish_point]
