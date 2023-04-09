@@ -7,6 +7,8 @@ import sys
 import cv2
 import qimage2ndarray
 import graph as gr
+import subprocess
+import genetic_algorithm as ga
 
 
 class Ui(QtWidgets.QMainWindow):
@@ -15,11 +17,69 @@ class Ui(QtWidgets.QMainWindow):
         uic.loadUi('Form.ui', self)
 
         self.graph = gr.Graph(1)
+        self.gen_alg = 0
         # Кнопки
+        # pushButton
+
+        # граф
         self.Count_points_spinBox.valueChanged.connect(self.change_count_point)
         self.Generate_graph_pushButton.clicked.connect(self.generate_graph)
         self.Save_Graph_pushButton.clicked.connect(self.change_adjacency_table_data)
         self.Back_Graph_pushButton.clicked.connect(lambda: self.create_table(self.graph.adjacency_table))
+        #  ГА
+        self.Create_GA_pushButton.clicked.connect(self.create_population)
+        self.Train_GA_pushButton.clicked.connect(self.Train_GA)
+        # radioButton
+        self.Graph_view_radioButton.toggled.connect(self.show_graph)
+        self.Statistics_view_radioButton.toggled.connect(self.show_statistics)
+        self.Ind_radioButton.toggled.connect(self.get_table_population)
+        self.Generation_radioButton.toggled.connect(self.get_table_generation)
+        self.Graph_radioButton.toggled.connect(self.create_table)
+
+    def create_population(self):
+        size_population = self.Size_population_spinBox.value()
+        count_generation = self.Count_General_spinBox.value()
+        mutation = self.Mutantion_doubleSpinBox.value() / 100
+        start_point = self.Start_point_spinBox.value()
+        finish_point = self.Finish_points_spinBox.value()
+
+        self.gen_alg = ga.GA(adjacency_table=self.graph.adjacency_table,
+                             start_point=start_point,
+                             finish_point=finish_point,
+                             size_population=size_population,
+                             mutation=mutation,
+                             max_generation=count_generation)
+
+        self.gen_alg.createGA()
+
+    def get_table_population(self):
+        self.Adjacency_TabletableWidget.setRowCount(len(self.gen_alg.population))
+        self.Adjacency_TabletableWidget.setColumnCount(len(self.gen_alg.population[0]))
+        self.Adjacency_TabletableWidget.setHorizontalHeaderLabels([str(i + 1) for i in range(len(self.gen_alg.population[0]))])
+
+        for row in range(len(self.gen_alg.population)):
+            for column in range(len(self.gen_alg.population[0])):
+                item = QTableWidgetItem(str(self.gen_alg.population[row][column]))
+                item.setTextAlignment(Qt.AlignHCenter)
+
+                self.Adjacency_TabletableWidget.setItem(row, column, item)
+
+    def get_table_generation(self):
+        self.Adjacency_TabletableWidget.setRowCount(len(self.gen_alg.list_population[0]))
+        self.Adjacency_TabletableWidget.setColumnCount(len(self.gen_alg.list_population))
+        self.Adjacency_TabletableWidget.setHorizontalHeaderLabels([str(f'Поколение {i}') for i in range(len(self.gen_alg.list_population))])
+
+        for row in range(len(self.gen_alg.list_population[0])):
+            for column in range(len(self.gen_alg.list_population)):
+                item = QTableWidgetItem(str(self.gen_alg.list_population[column][row]))
+                item.setTextAlignment(Qt.AlignHCenter)
+
+                self.Adjacency_TabletableWidget.setItem(row, column, item)
+    def Train_GA(self):
+        self.gen_alg.TrainGA()
+        self.Statistics_view_radioButton.setChecked(True)
+        self.show_statistics()
+        self.show_generation_info()
 
     def change_count_point(self):
         """Максимальное значение spinbox"""
@@ -65,12 +125,25 @@ class Ui(QtWidgets.QMainWindow):
                 self.Adjacency_TabletableWidget.setItem(row, column, item)
 
     def show_graph(self):
-        if self.Graph_view_checkBox.isChecked() is False:
+        if self.Graph_view_radioButton.isChecked() is False:
             self.Image_label.clear()
             return
 
         path_net = self.graph.draw_graph(show=False)
         self.view_image(path_net)
+
+    def show_statistics(self):
+        if self.Statistics_view_radioButton.isChecked() is False:
+            self.Image_label.clear()
+            return
+
+        path_state = self.gen_alg.draw_statistics()
+        self.view_image(path_state)
+
+    def show_generation_info(self):
+        for line in self.gen_alg.statistics_generation:
+            text = self.Log_textEdit.toPlainText() + line + '\n'
+            self.Log_textEdit.setPlainText(text)
 
     def view_image(self, image_path):
         # Считываю изображение по пути
@@ -87,6 +160,9 @@ class Ui(QtWidgets.QMainWindow):
 
 
 if __name__ == '__main__':
+    result = subprocess.run(["python", "-c", "print(subprocess)"], capture_output=True, text=True)
+    print('output: ', result.stdout)
+    print('error: ', result.stderr)
     app = QtWidgets.QApplication(sys.argv)
     window = Ui()
     window.show()

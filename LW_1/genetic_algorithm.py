@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import matplotlib.pyplot as plt
+import os
 
 SEED = 15
 random.seed(SEED)
@@ -23,13 +24,13 @@ class GA:
                  start_point,
                  finish_point,
                  size_population,
-                 crossover,
                  mutation,
-                 max_generation):
+                 max_generation,
+                 crossover=1):
 
         self.max_generation = max_generation
         self.mutation = mutation
-        self.crossover = crossover  # вероятность селекции
+        self.crossover = crossover
         self.size_population = size_population
         self.adjacency_table = adjacency_table
         self.start_point = start_point
@@ -42,8 +43,9 @@ class GA:
 
         self.population = []
         self.generationCounter = 0
-
+        self.list_population = []
         self.statistics_generation = []
+
     def graph_fitness(self, individual):
         _sum = 0
         for n, way in enumerate(individual):
@@ -116,15 +118,33 @@ class GA:
     def get_statistics(self):
         pass
 
-    def crateGA(self):
+    def createGA(self):
         self.population = self.population_create(n=self.size_population)
         self.generationCounter = 0
+
+    def draw_statistics(self):
+        path = "E:\\GitHub\\DoIS\\LW_1\\plot\\statistics.jpg"
+        plt.plot(self.minFitnessValues, color='green')
+        plt.plot(self.meanFitnessValues, color='blue')
+        plt.xlabel('Поколение')
+        plt.ylabel('Макс/средняя приспособленность')
+
+        try:
+            os.remove('LW_1/plot/state.jpg')
+        except:
+            pass
+        path = 'E:\\GitHub\\DoIS\\LW_1\\plot\\state.jpg'
+        plt.savefig(path)
+        plt.close()
+
+        return path
+
     def TrainGA(self):
         generationCounter = self.generationCounter
         population = self.population
-
         fitnessValues = list(map(self.graph_fitness, population))
         while generationCounter < self.max_generation:
+            self.list_population.append(population)
             generationCounter += 1
             offspring = self.selTournament(population, len(population))
             offspring = list(map(self.__clone, offspring))
@@ -154,6 +174,3 @@ class GA:
             best_index = fitnessValues.index(min(fitnessValues))
             state = f"Поколение {generationCounter}: Макс приспособ = {minFitness}, Средняя приспособ= {meanFitness} \n Лучший индивидуум = {population[best_index]}"
             self.statistics_generation.append(state)
-
-
-
