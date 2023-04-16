@@ -46,6 +46,8 @@ class GA:
         self.list_population = []
         self.statistics_generation = []
 
+        self.checkStep = 0
+        self.log_step = ''
     def graph_fitness(self, individual):
         _sum = 0
         for n, way in enumerate(individual):
@@ -85,10 +87,10 @@ class GA:
         return offspring
 
     @staticmethod
-    def mutantShuffle(mutant, indpb=0.01):
+    def mutantShuffle(mutant, indpb=0.1):
         for gen in mutant:
             if random.random() < indpb:
-                start_p = random.randint(1, len(gen) - 3)
+                start_p = random.randint(1, len(gen) - len(gen)//2)
                 end_p = start_p + random.randint(1, len(gen) - start_p)
                 mutant_gen = gen[start_p: end_p]
                 np.random.shuffle(mutant_gen)
@@ -98,7 +100,8 @@ class GA:
     @staticmethod
     def cxOrdered(ind1, ind2):
         size = min(len(ind1), len(ind2))
-        a = random.randint(1, size - 3)
+        f = len(ind1[0])
+        a = random.randint(1, size - f//2)
         b = a + random.randint(1, size - a)
 
         temp1, temp2 = ind1, ind2
@@ -121,6 +124,7 @@ class GA:
     def createGA(self):
         self.population = self.population_create(n=self.size_population)
         self.generationCounter = 0
+        fitnessValues = list(map(self.graph_fitness, self.population))
 
     def draw_statistics(self):
         path = "E:\\GitHub\\DoIS\\LW_1\\plot\\statistics.jpg"
@@ -130,15 +134,44 @@ class GA:
         plt.ylabel('Макс/средняя приспособленность')
 
         try:
-            os.remove('LW_1/plot/state.jpg')
+            os.remove('LW_1/plot/state.png')
         except:
             pass
-        path = 'E:\\GitHub\\DoIS\\LW_1\\plot\\state.jpg'
+        path = 'E:\\GitHub\\DoIS\\LW_1\\plot\\state.png'
         plt.savefig(path)
         plt.close()
 
         return path
 
+    def StepGA(self):
+        if self.generationCounter < self.max_generation:
+            if self.checkStep ==1:
+                self.log_step = f'Поколение {self.generationCounter}'
+
+            elif self.checkStep ==2:
+                self.log_step = 'Селекция популяции'
+                offspring = self.selTournament(self.population, len(self.population))
+                self.population = list(map(self.__clone, offspring))
+            elif self.checkStep ==3:
+                self.log_step = 'Скрещивание популяции'
+
+                new_offspring = []
+
+                for child1, child2 in zip(self.population[::2], self.population[1::2]):
+                    if random.random() < self.crossover:
+                        child1, child2 = self.cxOrdered(child1, child2)
+                    new_offspring.append(Individual(child1))
+                    new_offspring.append(Individual(child2))
+                self.population = new_offspring.copy()
+            elif self.checkStep == 4:
+                self.log_step = 'Мутация популяции'
+                for mutant in self.population:
+                    if random.random() < self.mutation:
+                        self.mutantShuffle(mutant )
+            if self.checkStep > 4:
+                self.log_step = ''
+                self.generationCounter+=1
+                self.checkStep = 0
 
     def TrainGA(self):
         generationCounter = self.generationCounter
@@ -146,7 +179,7 @@ class GA:
         population = self.population
         print(f'---------------< Начальная популяция >--------------')
         print(population)
-        fitnessValues = list(map(self.graph_fitness, population))
+        fitnessValues = list(map(self.graph_fitness, self.population))
         while generationCounter < self.max_generation:
             self.list_population.append(population)
             generationCounter += 1
@@ -172,7 +205,7 @@ class GA:
 
             for mutant in offspring:
                 if random.random() < self.mutation:
-                    self.mutantShuffle(mutant, indpb=1. / self.len_chrom / 36)
+                    self.mutantShuffle(mutant)
 
             print(f'---------------< Популяция после мутации >--------------')
             print(offspring)

@@ -15,9 +15,9 @@ class Graph:
         self.shortest_path = [0]
 
     @staticmethod
-    def __get_random_adjacency_table(count_point: int) -> list[list]:
+    def __get_random_adjacency_table(count_point: int):
         """Сгенерировать граф смежности """
-        rand_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 100]
+        rand_list = [i for i in range(count_point)] +[100]
         adjacency_table = []
 
         for i in range(count_point):
@@ -84,7 +84,7 @@ class Graph:
             alpha=0.5,
             edge_color="tab:red",
         )
-        path = 'E:\\GitHub\\DoIS\\LW_1\\plot\\network.jpg'
+        path = 'E:\\GitHub\\DoIS\\LW_1\\plot\\network.png'
         if path_short:
             path_edges = self.__get_shortest_path_edges()
             nx.draw_networkx_edges(
@@ -95,7 +95,7 @@ class Graph:
                 alpha=1,
                 edge_color="tab:green",
             )
-            path = 'E:\\GitHub\\DoIS\\LW_1\\plot\\network_path.jpg'
+            path = 'E:\\GitHub\\DoIS\\LW_1\\plot\\network_path.png'
         labels = {i: str(i+1) for i in range(len(nodes))}
         nx.draw_networkx_labels(G, pos, labels, font_size=15, font_color="whitesmoke")
 

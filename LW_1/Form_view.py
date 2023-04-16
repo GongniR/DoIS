@@ -11,6 +11,7 @@ import subprocess
 import genetic_algorithm as ga
 
 
+
 class Ui(QtWidgets.QMainWindow):
     def __init__(self):
         super(Ui, self).__init__()
@@ -29,12 +30,15 @@ class Ui(QtWidgets.QMainWindow):
         #  ГА
         self.Create_GA_pushButton.clicked.connect(self.create_population)
         self.Train_GA_pushButton.clicked.connect(self.Train_GA)
+        self.Train_Step_pushButton.clicked.connect(self.step_ga)
+
         # radioButton
         self.Graph_view_radioButton.toggled.connect(self.show_graph)
         self.Statistics_view_radioButton.toggled.connect(self.show_statistics)
+        self.Graph_radioButton.toggled.connect(lambda: self.create_table(self.graph.adjacency_table))
         self.Ind_radioButton.toggled.connect(self.get_table_population)
         self.Generation_radioButton.toggled.connect(self.get_table_generation)
-        self.Graph_radioButton.toggled.connect(self.create_table)
+
 
     def create_population(self):
         size_population = self.Size_population_spinBox.value()
@@ -170,8 +174,18 @@ class Ui(QtWidgets.QMainWindow):
         self.Image_label.clear()
         self.Image_label.setPixmap(image2pixmap)
 
+    def step_ga(self):
+        self.gen_alg.checkStep+=1
+        self.gen_alg.StepGA()
+        text = self.Log_textEdit.toPlainText() + self.gen_alg.log_step + '\n'
+        self.Log_textEdit.setPlainText(text)
+        self.get_table_population()
 
 if __name__ == '__main__':
+    if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'): QtWidgets.QApplication.setAttribute(
+        QtCore.Qt.AA_EnableHighDpiScaling, True)
+    if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'): QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps,
+                                                                                       True)
     app = QtWidgets.QApplication(sys.argv)
     window = Ui()
     window.show()
