@@ -1,3 +1,11 @@
+"""'
+Пахомов Д.В.
+Группа: 224-321
+Почта: pakhomovdv0@gmail.com
+Курс: https://online.mospolytech.ru/course/view.php?id=10055
+Год разработки: 2023
+"""
+
 import numpy as np
 from PyQt5 import QtWidgets, QtCore, uic, QtGui
 from PyQt5.QtWidgets import QFileDialog, QTableWidget, QTableWidgetItem
@@ -9,7 +17,6 @@ import qimage2ndarray
 import graph as gr
 import subprocess
 import genetic_algorithm as ga
-
 
 
 class Ui(QtWidgets.QMainWindow):
@@ -95,6 +102,7 @@ class Ui(QtWidgets.QMainWindow):
         self.Finish_points_spinBox.setMaximum(max_value)
 
     def generate_graph(self):
+        self.graph.shortest_path = False
         """Генерация графа"""
         count_point = self.Count_points_spinBox.value()
         self.graph = gr.Graph(count_point)
@@ -119,6 +127,7 @@ class Ui(QtWidgets.QMainWindow):
         self.graph.adjacency_table = data
 
     def create_table(self, adjacency_table):
+        self.graph.path_short = False
         """Заполнить таблицу"""
         self.Adjacency_TabletableWidget.setRowCount(len(adjacency_table))
         self.Adjacency_TabletableWidget.setColumnCount(len(adjacency_table[0]))

@@ -1,4 +1,11 @@
-import numpy as np
+"""'
+Пахомов Д.В.
+Группа: 224-321
+Почта: pakhomovdv0@gmail.com
+Курс: https://online.mospolytech.ru/course/view.php?id=10055
+Год разработки: 2023
+"""
+
 import random
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -17,7 +24,7 @@ class Graph:
     @staticmethod
     def __get_random_adjacency_table(count_point: int):
         """Сгенерировать граф смежности """
-        rand_list = [i for i in range(count_point)] +[100]
+        rand_list = [i for i in range(count_point)] + [100]
         adjacency_table = []
 
         for i in range(count_point):
@@ -57,7 +64,7 @@ class Graph:
         self.shortest_path = new_path
 
     def __get_shortest_path_edges(self):
-        index = self.shortest_path.index(self.finish_point)
+        index = self.shortest_path.index(self.finish_point) + 1
         if index == 0:
             path = [self.start_point] + [self.shortest_path[index]]
         else:
@@ -80,7 +87,7 @@ class Graph:
             G,
             pos,
             edgelist=edges,
-            width=8,
+            width=3,
             alpha=0.5,
             edge_color="tab:red",
         )
@@ -96,7 +103,7 @@ class Graph:
                 edge_color="tab:green",
             )
             path = 'E:\\GitHub\\DoIS\\LW_1\\plot\\network_path.png'
-        labels = {i: str(i+1) for i in range(len(nodes))}
+        labels = {i: str(i + 1) for i in range(len(nodes))}
         nx.draw_networkx_labels(G, pos, labels, font_size=15, font_color="whitesmoke")
 
         # рисуем граф и отображаем его

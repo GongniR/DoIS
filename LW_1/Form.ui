@@ -185,7 +185,7 @@
       <number>1</number>
      </property>
      <property name="maximum">
-      <number>50</number>
+      <number>100</number>
      </property>
     </widget>
     <widget class="QPushButton" name="Generate_graph_pushButton">
