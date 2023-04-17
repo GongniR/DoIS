@@ -24,7 +24,7 @@ class Graph:
     @staticmethod
     def __get_random_adjacency_table(count_point: int):
         """Сгенерировать граф смежности """
-        rand_list = [i for i in range(count_point)] + [100]
+        rand_list = [i for i in range(1, count_point)] + [100]
         adjacency_table = []
 
         for i in range(count_point):

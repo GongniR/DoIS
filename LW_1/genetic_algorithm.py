@@ -101,7 +101,7 @@ class GA:
         return offspring
 
     @staticmethod
-    def mutantShuffle(mutant, indpb=0.1):
+    def mutantShuffle(mutant, indpb=1):
         for gen in mutant:
             if random.random() < indpb:
                 start_p = random.randint(1, len(gen) - len(gen) // 2)
