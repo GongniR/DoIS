@@ -74,7 +74,7 @@ class GA:
 
     def individual_create(self):
         """Генерация индивидуума"""
-        return Individual([random.sample(range(self.len_graph), self.len_graph)])
+        return Individual([[i for i in range(self.len_graph)]])
 
     def population_create(self, n=0):
         """ Создание популяции"""
